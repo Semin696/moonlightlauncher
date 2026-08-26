@@ -74,6 +74,18 @@ document.querySelectorAll('[data-close]').forEach(btn => {
 
 $('heroDownloadBtn').addEventListener('click', requestDownload);
 
+document.querySelectorAll('.pricing-card-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (user) location.href = 'profile.html#sub';
+    else {
+      const hint = $('heroHint');
+      hint.textContent = 'Войдите, чтобы приобрести подписку.';
+      hint.classList.remove('hidden');
+      setTimeout(() => hint.classList.add('hidden'), 4000);
+    }
+  });
+});
+
 document.querySelectorAll('[data-auth-tab]').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('[data-auth-tab]').forEach(t => t.classList.remove('active'));
