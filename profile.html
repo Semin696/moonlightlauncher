@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Профиль — MoonLight Visual</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="stars" aria-hidden="true"></div>
+  <div class="moon-glow" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="brand" href="index.html">
+      <img src="logo.png" alt="" class="brand-logo">
+      <span>MoonLight <span class="accent">Visual</span></span>
+    </a>
+    <nav class="nav">
+      <a href="index.html">На главную</a>
+    </nav>
+    <div class="auth-area" id="authArea"></div>
+  </header>
+
+  <main>
+    <section class="section section-narrow">
+      <h2>Профиль</h2>
+
+      <div class="card download-card">
+        <div class="loading" id="pageLoading">
+          <div class="spinner"></div>
+          <p>Загрузка...</p>
+        </div>
+
+        <div id="guestGate" class="hidden">
+          <p class="hint center">Вы не вошли в аккаунт.</p>
+          <a class="btn primary wide" href="index.html">Войти на главной странице</a>
+        </div>
+
+        <div id="profileContent" class="hidden">
+          <div class="profile-head">
+            <div class="avatar" id="profileAvatar">?</div>
+            <div>
+              <div class="profile-name" id="profileName"></div>
+              <div class="profile-role" id="profileRole"></div>
+            </div>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="info">Профиль</button>
+            <button class="tab" data-tab="launcher">Лаунчер</button>
+            <button class="tab" data-tab="sub">Подписка</button>
+          </div>
+
+          <div id="tabInfo" class="modal-form">
+            <div class="profile-rows">
+              <div class="profile-row">
+                <span>Статус</span>
+                <span id="profileSub"></span>
+              </div>
+              <div class="profile-row">
+                <span>Дата регистрации</span>
+                <span id="profileDate"></span>
+              </div>
+            </div>
+            <a class="btn ghost wide" href="subscribe.html">Страница подписки</a>
+          </div>
+
+          <div id="tabLauncher" class="modal-form hidden">
+            <div class="profile-rows">
+              <div class="profile-row">
+                <span>Активные подписки</span>
+                <span id="launcherSubs"></span>
+              </div>
+            </div>
+            <div id="launcherGate" class="hidden">
+              <p class="hint center">Для скачивания нужна подписка. Подписка не продаётся — активируйте код во вкладке «Подписка».</p>
+              <button class="btn primary wide" id="toSubTabBtn">Перейти к подписке</button>
+            </div>
+            <div id="launcherDownloads" class="hidden">
+              <div class="download-list" id="downloadList"></div>
+              <div class="status hidden" id="errorState">
+                <p>Лаунчер пока не загружен.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="tabSub" class="modal-form hidden">
+            <div class="sub-plans single">
+              <div class="sub-plan">
+                <div class="sub-plan-name">Навсегда</div>
+                <div class="sub-plan-price">9 999 ₽</div>
+                <span class="badge nosub">Недоступно</span>
+              </div>
+            </div>
+            <p class="hint center">Подписка сейчас не продаётся. Есть код от владельца? Активируйте его:</p>
+            <label class="field-label" for="subCodeInput">Код активации</label>
+            <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-SUB-XXXXXX" spellcheck="false" autocomplete="off">
+            <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
+            <div class="status" id="subStatus"></div>
+
+            <div class="owner-block hidden" id="subOwnerBlock">
+              <p class="hint center">Функция владельца: создание ключей активации.</p>
+              <label class="field-label" for="keyType">Тип ключа</label>
+              <select id="keyType" class="input">
+                <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
+                <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
+                <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
+              </select>
+              <button class="btn primary wide" id="tabGenKeyBtn">Создать ключ активации</button>
+              <div class="status" id="tabGenKeyStatus"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 MoonLight Visual</p>
+  </footer>
+
+  <script src="profile.js"></script>
+</body>
+</html>

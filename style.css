@@ -674,6 +674,10 @@ code {
   margin-bottom: 16px;
 }
 
+.sub-plans.single {
+  grid-template-columns: 1fr;
+}
+
 .sub-plan {
   background: var(--bg-card-hover);
   border: 1px solid var(--border);

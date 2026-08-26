@@ -57,7 +57,7 @@ function renderPage() {
   guest.classList.add('hidden');
   page.classList.remove('hidden');
   $('subsBadge').innerHTML = user.subscribed
-    ? '<span class="badge sub">Тестовая подписка · активна</span>'
+    ? `<span class="badge sub">${user.role === 'owner' ? 'Владельческая подписка · активна' : 'Подписка · активна'}</span>`
     : '<span class="badge nosub">Нет</span>';
   $('subOwnerBlock').classList.toggle('hidden', !isOwner());
 }
