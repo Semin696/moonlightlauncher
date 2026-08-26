@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "moonlight.client.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+  ],
+  "client": [
+    "events.MixinRender2D",
+    "events.MixinMouse",
+    "events.MixinKeyboard",
+    "events.MixinChat",
+    "minecraft.EffectIconMixin",
+    "minecraft.MixinTitleScreen",
+    "minecraft.MixinMinecraftClient",
+    "minecraft.SessionAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

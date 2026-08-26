@@ -18,6 +18,7 @@ partial class Launcher : Form
     string[] navItems = { "Главная", "Версия", "Аккаунт", "Мастерская", "Новости", "Настройки" };
     int activeNav;
     int hoverNav = -1;
+    internal string[][] settingsRows;
 
     Panel sidebar, logOverlay;
     GradientButton play;
@@ -118,6 +119,11 @@ partial class Launcher : Form
 
         BuildPages(cx, cy, cw, ch);
 
+        SetDoubleBuffer(sidebar);
+        SetDoubleBuffer(logOverlay);
+        foreach (var page in new[] { pageHome, pageVersions, pageAccount, pageWorkshop, pageNews, pageSettings })
+            SetDoubleBuffer(page);
+
         logOverlay = new Panel();
         logOverlay.Bounds = new Rectangle(cx, cy, cw, ch);
         logOverlay.Visible = false;
@@ -140,7 +146,7 @@ partial class Launcher : Form
         AppendLog("[moonlight] лаунчер готов");
 
         ShowPage(0);
-        SyncNick("moonlight");
+        SyncNick("moonlight", null);
     }
 
     void PaintSidebar(object sender, PaintEventArgs e)
@@ -269,14 +275,28 @@ partial class Launcher : Form
 
         try
         {
-            string configDir = Path.Combine(dir, "moonlight");
+            string runDir = File.Exists(Path.Combine(dir, "run-command.txt"))
+                ? Path.Combine(dir, "run")
+                : Path.Combine(dir, "run");
+
+            string configDir = Path.Combine(runDir, "moonlight");
             Directory.CreateDirectory(configDir);
             File.WriteAllText(Path.Combine(configDir, "launcher-nick.txt"), nickValue);
             AppendLog("[moonlight] ник: " + nickValue);
         }
         catch { }
 
-        if (!logVisible) ToggleLog();
+        if (GetSetting("autoLog") == "1" && !logVisible) ToggleLog();
+
+        try
+        {
+            string discordFile = Path.Combine(dir, "run", "moonlight", "discord-enabled.txt");
+            Directory.CreateDirectory(Path.GetDirectoryName(discordFile));
+
+            if (GetSetting("discordRpc") == "1") File.WriteAllText(discordFile, "1");
+            else if (File.Exists(discordFile)) File.Delete(discordFile);
+        }
+        catch { }
 
         play.Enabled = false;
         play.Text = "Запуск...";
@@ -368,13 +388,13 @@ partial class Launcher : Form
     {
         var psi = new ProcessStartInfo();
         psi.UseShellExecute = false;
-        psi.CreateNoWindow = true;
-        psi.RedirectStandardOutput = true;
-        psi.RedirectStandardError = true;
+        psi.CreateNoWindow = GetSetting("hideConsole") == "1";
+        psi.RedirectStandardOutput = GetSetting("hideConsole") == "1";
+        psi.RedirectStandardError = GetSetting("hideConsole") == "1";
 
         string cmdFile = Path.Combine(dir, "run-command.txt");
 
-        if (File.Exists(cmdFile))
+        if (File.Exists(cmdFile) && GetSetting("fastLaunch") == "1")
         {
             string mainClass = "", classpath = "", workingDir = dir, javaExec = "{{JAVA}}", jvmArgs = "", args = "";
 
@@ -453,10 +473,7 @@ partial class Launcher : Form
     {
         try
         {
-            string png = Path.Combine(Application.StartupPath, "src", "main", "resources", "assets", "moonlight", "logo.png");
-            if (File.Exists(png))
-                using (var bmp = new Bitmap(png))
-                    return Icon.FromHandle(bmp.GetHicon());
+            return Icon.ExtractAssociatedIcon(Application.ExecutablePath);
         }
         catch { }
 
@@ -467,6 +484,13 @@ partial class Launcher : Form
             UI.DrawCrescent(g, 16, 16, 14, Palette.Accent, Color.FromArgb(17, 17, 23));
         }
         return Icon.FromHandle(bitmap.GetHicon());
+    }
+
+    static void SetDoubleBuffer(Control control)
+    {
+        typeof(Control).GetProperty("DoubleBuffered",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.SetProperty)
+            .SetValue(control, true, null);
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)

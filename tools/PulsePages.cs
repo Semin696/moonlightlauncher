@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Windows.Forms;
 
 partial class Launcher
@@ -151,7 +152,7 @@ partial class Launcher
         heroNick.Location = new Point((int)(46 * ui), (int)(11 * ui));
         heroNick.GotFocus += (s, e) => { heroNick.SelectionStart = heroNick.TextLength; heroNick.SelectionLength = 0; nickBox.Invalidate(); };
         heroNick.LostFocus += (s, e) => nickBox.Invalidate();
-        heroNick.TextChanged += (s, e) => SyncNick(heroNick.Text);
+        heroNick.TextChanged += (s, e) => SyncNick(heroNick.Text, heroNick);
         nickBox.Controls.Add(heroNick);
 
         play = new GradientButton();
@@ -301,7 +302,7 @@ partial class Launcher
         accountNick.Font = new Font("Segoe UI", 11.5f * ui);
         accountNick.Size = new Size(nickBox.Width - (int)(20 * ui), (int)(24 * ui));
         accountNick.Location = new Point((int)(10 * ui), (int)(10 * ui));
-        accountNick.TextChanged += (s, e) => SyncNick(accountNick.Text);
+        accountNick.TextChanged += (s, e) => SyncNick(accountNick.Text, accountNick);
         nickBox.Controls.Add(accountNick);
     }
 
@@ -356,12 +357,14 @@ partial class Launcher
     {
         string[][] rows =
         {
-            new[] { "Скрытая консоль", "Игра запускается без чёрного окна" },
-            new[] { "Логи в лаунчере", "Кнопка ЛОГ в верхней панели" },
-            new[] { "Discord RPC", "game/moonlight/discord-clientid.txt" },
-            new[] { "Смена ника", "Главная или Аккаунт, по умолчанию moonlight" },
-            new[] { "Язык клиента", "Русский" }
+            new[] { "Скрытая консоль", "Игра запускается без чёрного окна", "hideConsole", "1" },
+            new[] { "Логи в лаунчере", "Открывать панель логов при запуске", "autoLog", "1" },
+            new[] { "Discord RPC", "Кастомный статус в Discord", "discordRpc", "1" },
+            new[] { "Быстрый запуск", "Запуск без пересборки проекта", "fastLaunch", "1" },
+            new[] { "Язык клиента", "Русский", "lang", "ru" }
         };
+
+        settingsRows = rows;
 
         pageSettings.Paint += (s, e) =>
         {
@@ -378,8 +381,96 @@ partial class Launcher
                     new Point(rect.X + (int)(16 * ui), rect.Y + (int)(8 * ui)), Palette.Title);
                 TextRenderer.DrawText(g, rows[i][1], new Font("Segoe UI", 8f * ui),
                     new Point(rect.X + (int)(16 * ui), rect.Y + (int)(26 * ui)), Palette.Dim);
+
+                bool enabled = GetSetting(rows[i][2]) == "1";
+                var toggle = new Rectangle(rect.Right - (int)(64 * ui), rect.Y + (int)(13 * ui), (int)(48 * ui), (int)(20 * ui));
+
+                using (var path = UI.Round(toggle, (int)(10 * ui)))
+                using (var fill = new SolidBrush(enabled ? Palette.Success : Color.FromArgb(55, 55, 72)))
+                    g.FillPath(fill, path);
+
+                var knob = new Rectangle(enabled ? toggle.Right - (int)(18 * ui) : toggle.X + (int)(2 * ui), toggle.Y + (int)(2 * ui), (int)(16 * ui), (int)(16 * ui));
+                using (var path = UI.Round(knob, (int)(8 * ui)))
+                using (var fill = new SolidBrush(Color.White))
+                    g.FillPath(fill, path);
+
+                string state = rows[i][2] == "lang" ? "Русский" : (enabled ? "Вкл" : "Выкл");
+                TextRenderer.DrawText(g, state, new Font("Segoe UI", 7.5f * ui),
+                    new Rectangle(toggle.X - (int)(70 * ui), toggle.Y - (int)(2 * ui), (int)(64 * ui), toggle.Height),
+                    Palette.Dim, TextFormatFlags.VerticalCenter | TextFormatFlags.Right);
             }
         };
+
+        pageSettings.MouseClick += (s, e) =>
+        {
+            int index = (int)((e.Y - (int)(48 * ui)) / ((int)(56 * ui)));
+
+            if (index < 0 || index >= rows.Length) return;
+
+            string key = rows[index][2];
+            if (key == "lang") return;
+
+            SetSetting(key, GetSetting(key) == "1" ? "0" : "1");
+            pageSettings.Invalidate();
+
+            AppendLog("[настройки] " + rows[index][0] + ": " + (GetSetting(key) == "1" ? "вкл" : "выкл"));
+        };
+    }
+
+    string SettingsFile()
+    {
+        return Path.Combine(Application.StartupPath, "game", "run", "moonlight", "launcher-settings.txt");
+    }
+
+    string GetSetting(string key)
+    {
+        foreach (string line in ReadSettings())
+        {
+            int idx = line.IndexOf('=');
+            if (idx > 0 && line.Substring(0, idx) == key) return line.Substring(idx + 1);
+        }
+
+        foreach (string[] row in settingsRows)
+            if (row[2] == key) return row[3];
+
+        return "0";
+    }
+
+    System.Collections.Generic.List<string> ReadSettings()
+    {
+        var list = new System.Collections.Generic.List<string>();
+        try
+        {
+            if (File.Exists(SettingsFile()))
+                list.AddRange(File.ReadAllLines(SettingsFile()));
+        }
+        catch { }
+        return list;
+    }
+
+    void SetSetting(string key, string value)
+    {
+        var lines = ReadSettings();
+        bool replaced = false;
+
+        for (int i = 0; i < lines.Count; i++)
+        {
+            int idx = lines[i].IndexOf('=');
+            if (idx > 0 && lines[i].Substring(0, idx) == key)
+            {
+                lines[i] = key + "=" + value;
+                replaced = true;
+            }
+        }
+
+        if (!replaced) lines.Add(key + "=" + value);
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile()));
+            File.WriteAllLines(SettingsFile(), lines);
+        }
+        catch { }
     }
 
     void ShowPage(int index)
@@ -394,7 +485,7 @@ partial class Launcher
         sidebar.Invalidate();
     }
 
-    void SyncNick(string value)
+    void SyncNick(string value, TextBox source)
     {
         if (string.IsNullOrEmpty(value)) value = "moonlight";
 
@@ -402,7 +493,7 @@ partial class Launcher
         greeting.Text = "С возвращением, " + value + "!";
         sidebar.Invalidate();
 
-        if (heroNick != null && heroNick.Text != value) heroNick.Text = value;
-        if (accountNick != null && accountNick.Text != value) accountNick.Text = value;
+        if (heroNick != null && heroNick != source && heroNick.Text != value) heroNick.Text = value;
+        if (accountNick != null && accountNick != source && accountNick.Text != value) accountNick.Text = value;
     }
 }
