@@ -106,23 +106,13 @@ function renderAuthArea() {
   const badge = hasSub()
     ? `<span class="badge sub">Подписка</span>`
     : `<span class="badge nosub">Без подписки</span>`;
-  const ownerBtn = isOwner()
-    ? `<button class="btn ghost small" id="ownerPanelBtn">Панель владельца</button>`
-    : '';
   area.innerHTML = `
     <span class="badge name link" id="profileBadge" title="Открыть профиль">${esc(state.user.username)}</span>
     ${badge}
-    ${ownerBtn}
     <button class="btn ghost small" id="logoutBtn">Выйти</button>
   `;
   $('logoutBtn').addEventListener('click', clearSession);
   $('profileBadge').addEventListener('click', () => openProfile('info'));
-  if (isOwner()) {
-    $('ownerPanelBtn').addEventListener('click', () => {
-      openModal('ownerOverlay');
-      refreshCodes();
-    });
-  }
 }
 
 function renderLauncherTab() {
@@ -178,7 +168,8 @@ function renderProfile() {
   $('profileDate').textContent = u.createdAt
     ? new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
-  $('profileOwnerBtn').classList.toggle('hidden', !isOwner());
+  $('panelTabBtn').classList.toggle('hidden', !isOwner());
+  $('subOwnerBlock').classList.toggle('hidden', !isOwner());
 }
 
 function switchProfileTab(tab) {
@@ -186,6 +177,7 @@ function switchProfileTab(tab) {
   $('profileTabInfo').classList.toggle('hidden', tab !== 'info');
   $('profileTabLauncher').classList.toggle('hidden', tab !== 'launcher');
   $('profileTabSub').classList.toggle('hidden', tab !== 'sub');
+  $('profileTabPanel').classList.toggle('hidden', tab !== 'panel');
 }
 
 function openProfile(tab) {
@@ -234,6 +226,7 @@ document.querySelectorAll('[data-profile-tab]').forEach(tab => {
   tab.addEventListener('click', () => {
     switchProfileTab(tab.dataset.profileTab);
     if (tab.dataset.profileTab === 'launcher') renderLauncherTab();
+    if (tab.dataset.profileTab === 'panel') refreshCodes();
   });
 });
 
@@ -353,6 +346,20 @@ $('genCodeBtn').addEventListener('click', async () => {
     refreshCodes();
   } catch (err) {
     $('ownerStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
+  }
+});
+
+$('tabGenKeyBtn').addEventListener('click', async () => {
+  try {
+    const data = await api('/api/codes', {
+      method: 'POST',
+      body: { type: $('keyType').value },
+    });
+    navigator.clipboard?.writeText(data.code).catch(() => {});
+    $('tabGenKeyStatus').innerHTML =
+      `<span class="ok">Ключ создан: <span class="code-value">${esc(data.code)}</span> — скопирован в буфер</span>`;
+  } catch (err) {
+    $('tabGenKeyStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
   }
 });
 
