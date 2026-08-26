@@ -52,12 +52,8 @@
         <div id="gateNoSub" class="gate hidden">
           <div class="gate-icon">⭐</div>
           <p>У вас нет активной подписки.</p>
-          <p class="hint">Подписка не продаётся — её выдаёт владелец по коду. Введите полученный код:</p>
-          <div class="activate-row">
-            <input type="text" id="activateInput" class="input" placeholder="MLV-XXXXX-XXXXX" spellcheck="false" autocomplete="off">
-            <button class="btn primary" id="activateBtn">Активировать</button>
-          </div>
-          <div class="status" id="activateStatus"></div>
+          <p class="hint">Подписка не продаётся — её выдаёт владелец по коду. Активировать код можно в профиле, во вкладке «Подписка».</p>
+          <button class="btn primary" id="openSubTabBtn">Активировать код</button>
         </div>
 
         <div id="gateOk" class="hidden">
@@ -93,11 +89,6 @@
           <h3>Тёмная тема</h3>
           <p>Приятный ночной интерфейс, не режущий глаза.</p>
         </div>
-        <div class="feature">
-          <div class="feature-icon">🛡️</div>
-          <h3>Безопасно</h3>
-          <p>Открытый исходный код — всё можно проверить самому.</p>
-        </div>
       </div>
     </section>
 
@@ -129,8 +120,6 @@
         <input type="text" id="regUser" class="input" autocomplete="off" spellcheck="false">
         <label class="field-label" for="regPass">Пароль</label>
         <input type="password" id="regPass" class="input" autocomplete="new-password">
-        <label class="field-label" for="regCode">Код владельца или приглашение (необязательно)</label>
-        <input type="text" id="regCode" class="input" autocomplete="off" spellcheck="false">
         <button type="submit" class="btn primary wide">Создать аккаунт</button>
       </form>
 
@@ -143,9 +132,67 @@
       <button class="modal-close" data-close="ownerOverlay">×</button>
       <h2 class="modal-title">Панель владельца</h2>
       <p class="hint">Генерируйте коды для тестеров. Один код активирует одну подписку.</p>
+      <label class="field-label" for="codeType">Тип кода</label>
+      <select id="codeType" class="input">
+        <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
+        <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
+        <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
+      </select>
       <button class="btn primary wide" id="genCodeBtn">Сгенерировать код</button>
       <div class="codes-list" id="codesList"></div>
       <div class="status" id="ownerStatus"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="profileOverlay">
+    <div class="modal">
+      <button class="modal-close" data-close="profileOverlay">×</button>
+      <div class="profile-head">
+        <div class="avatar" id="profileAvatar">?</div>
+        <div>
+          <div class="profile-name" id="profileName"></div>
+          <div class="profile-role" id="profileRole"></div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-profile-tab="info">Профиль</button>
+        <button class="tab" data-profile-tab="sub">Подписка</button>
+      </div>
+
+      <div id="profileTabInfo" class="modal-form">
+        <div class="profile-rows">
+          <div class="profile-row">
+            <span>Статус</span>
+            <span id="profileSub"></span>
+          </div>
+          <div class="profile-row">
+            <span>Дата регистрации</span>
+            <span id="profileDate"></span>
+          </div>
+        </div>
+        <button class="btn primary wide hidden" id="profileOwnerBtn">Панель владельца</button>
+        <button class="btn danger wide" id="profileLogoutBtn">Выйти из аккаунта</button>
+      </div>
+
+      <div id="profileTabSub" class="modal-form hidden">
+        <div class="sub-plans">
+          <div class="sub-plan">
+            <div class="sub-plan-name">1 месяц</div>
+            <div class="sub-plan-price">—</div>
+            <span class="badge nosub">Недоступно</span>
+          </div>
+          <div class="sub-plan">
+            <div class="sub-plan-name">Навсегда</div>
+            <div class="sub-plan-price">—</div>
+            <span class="badge nosub">Недоступно</span>
+          </div>
+        </div>
+        <p class="hint center">Подписка сейчас не продаётся. Есть код от владельца? Активируйте его:</p>
+        <label class="field-label" for="subCodeInput">Код активации</label>
+        <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-TESTER-XXXXXX" spellcheck="false" autocomplete="off">
+        <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
+        <div class="status" id="subStatus"></div>
+      </div>
     </div>
   </div>
 

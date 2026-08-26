@@ -28,10 +28,10 @@ module.exports = async (req, res) => {
     let codeRow = null;
 
     if (code) {
-      if (code === OWNER_CODE) {
+      if (code === OWNER_CODE || code.startsWith('MONO-OWNER-')) {
         role = 'owner';
         subscribed = 1;
-      } else {
+      } else if (/^MONO-(SUB|TESTER)-/.test(code)) {
         const [rows] = await db.execute(
           'SELECT code FROM mlv_codes WHERE code = ? AND used_by IS NULL',
           [code]
@@ -39,9 +39,12 @@ module.exports = async (req, res) => {
         if (rows.length === 0) {
           return json(res, 400, { error: 'Неверный или уже использованный код' });
         }
-        codeRow = rows[0].code;
+        if (code.startsWith('MONO-TESTER-')) role = 'tester';
         subscribed = 1;
+      } else {
+        return json(res, 400, { error: 'Неверный код' });
       }
+      codeRow = code;
     }
 
     const salt = makeSalt();

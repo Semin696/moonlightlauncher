@@ -36,7 +36,8 @@ async function ensureSchema() {
       `);
       await db.execute(`
         CREATE TABLE IF NOT EXISTS mlv_codes (
-          code VARCHAR(24) PRIMARY KEY,
+          code VARCHAR(32) PRIMARY KEY,
+          type ENUM('sub','tester','owner') NULL,
           created_by INT NULL,
           used_by INT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -51,6 +52,12 @@ async function ensureSchema() {
           FOREIGN KEY (user_id) REFERENCES mlv_users(id) ON DELETE CASCADE
         ) CHARACTER SET utf8mb4
       `);
+      await db.execute(
+        "ALTER TABLE mlv_users MODIFY COLUMN role ENUM('user','tester','owner') NOT NULL DEFAULT 'user'"
+      ).catch(() => {});
+      await db.execute(
+        "ALTER TABLE mlv_codes ADD COLUMN type ENUM('sub','tester','owner') NULL"
+      ).catch(() => {});
     })().catch(e => {
       global.__mlvSchema = null;
       throw e;
@@ -96,12 +103,18 @@ function makeToken() {
 }
 
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const CODE_PREFIXES = {
+  sub: 'MONO-SUB',
+  tester: 'MONO-TESTER',
+  owner: 'MONO-OWNER',
+};
 
-function makeCode() {
-  const bytes = crypto.randomBytes(10);
+function makeCode(type) {
+  const prefix = CODE_PREFIXES[type] || CODE_PREFIXES.tester;
+  const bytes = crypto.randomBytes(6);
   let out = '';
-  for (let i = 0; i < 10; i++) out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
-  return `MLV-${out.slice(0, 5)}-${out.slice(5)}`;
+  for (let i = 0; i < 6; i++) out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+  return `${prefix}-${out}`;
 }
 
 async function auth(req) {
@@ -110,7 +123,7 @@ async function auth(req) {
   if (!token) return null;
   await ensureSchema();
   const [rows] = await getPool().execute(
-    `SELECT u.id, u.username, u.role, u.subscribed
+    `SELECT u.id, u.username, u.role, u.subscribed, u.created_at
      FROM mlv_sessions s JOIN mlv_users u ON u.id = s.user_id
      WHERE s.token = ? AND s.created_at > NOW() - INTERVAL 30 DAY`,
     [token]

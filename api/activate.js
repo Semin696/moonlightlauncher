@@ -13,9 +13,14 @@ module.exports = async (req, res) => {
     await ensureSchema();
     const db = getPool();
 
-    if (value === OWNER_CODE) {
-      await db.execute('UPDATE mlv_users SET role = ?, subscribed = 1 WHERE id = ?', ['owner', user.id]);
-      return json(res, 200, { ok: true, message: 'Код владельца активирован' });
+    let role = null;
+
+    if (value === OWNER_CODE || value.startsWith('MONO-OWNER-')) {
+      role = 'owner';
+    } else if (value.startsWith('MONO-TESTER-')) {
+      role = 'tester';
+    } else if (!/^MONO-SUB-/.test(value)) {
+      return json(res, 400, { error: 'Неверный код' });
     }
 
     const [rows] = await db.execute(
@@ -26,12 +31,26 @@ module.exports = async (req, res) => {
       return json(res, 400, { error: 'Неверный или уже использованный код' });
     }
 
-    await db.execute('UPDATE mlv_users SET subscribed = 1 WHERE id = ?', [user.id]);
+    if (role === 'owner') {
+      await db.execute('UPDATE mlv_users SET role = ?, subscribed = 1 WHERE id = ?', ['owner', user.id]);
+    } else if (role === 'tester') {
+      await db.execute('UPDATE mlv_users SET role = ?, subscribed = 1 WHERE id = ?', ['tester', user.id]);
+    } else {
+      await db.execute('UPDATE mlv_users SET subscribed = 1 WHERE id = ?', [user.id]);
+    }
+
     await db.execute('UPDATE mlv_codes SET used_by = ?, used_at = NOW() WHERE code = ?', [
       user.id,
       value,
     ]);
-    return json(res, 200, { ok: true, message: 'Подписка активирована' });
+
+    const message =
+      role === 'owner'
+        ? 'Код владельца активирован'
+        : role === 'tester'
+          ? 'Доступ тестера активирован'
+          : 'Подписка активирована';
+    return json(res, 200, { ok: true, message });
   } catch (e) {
     console.error(e);
     return json(res, 500, { error: 'Ошибка сервера' });

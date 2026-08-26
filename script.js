@@ -37,6 +37,14 @@ function setSession(token, user) {
   renderAll();
 }
 
+async function applySession(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+  const me = await api('/api/me');
+  state.user = me.user;
+  renderAll();
+  return me.user;
+}
+
 function clearSession() {
   const token = localStorage.getItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_KEY);
@@ -102,12 +110,13 @@ function renderAuthArea() {
     ? `<button class="btn ghost small" id="ownerPanelBtn">Панель владельца</button>`
     : '';
   area.innerHTML = `
-    <span class="badge name">${esc(state.user.username)}</span>
+    <span class="badge name link" id="profileBadge" title="Открыть профиль">${esc(state.user.username)}</span>
     ${badge}
     ${ownerBtn}
     <button class="btn ghost small" id="logoutBtn">Выйти</button>
   `;
   $('logoutBtn').addEventListener('click', clearSession);
+  $('profileBadge').addEventListener('click', () => openProfile('info'));
   if (isOwner()) {
     $('ownerPanelBtn').addEventListener('click', () => {
       openModal('ownerOverlay');
@@ -158,6 +167,37 @@ async function restoreSession() {
   }
 }
 
+function renderProfile() {
+  const u = state.user;
+  if (!u) return;
+  $('profileAvatar').textContent = (u.username[0] || '?').toUpperCase();
+  $('profileName').textContent = u.username;
+  let roleText = 'Пользователь';
+  if (u.role === 'owner') roleText = 'Владелец';
+  else if (u.role === 'tester') roleText = 'Тестер';
+  else if (u.subscribed) roleText = 'С подпиской';
+  $('profileRole').textContent = roleText;
+  $('profileSub').innerHTML = hasSub()
+    ? '<span class="ok">Активна</span>'
+    : '<span class="err">Нет</span>';
+  $('profileDate').textContent = u.createdAt
+    ? new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '—';
+  $('profileOwnerBtn').classList.toggle('hidden', !isOwner());
+}
+
+function switchProfileTab(tab) {
+  document.querySelectorAll('[data-profile-tab]').forEach(t => t.classList.toggle('active', t.dataset.profileTab === tab));
+  $('profileTabInfo').classList.toggle('hidden', tab !== 'info');
+  $('profileTabSub').classList.toggle('hidden', tab !== 'sub');
+}
+
+function openProfile(tab) {
+  renderProfile();
+  switchProfileTab(tab);
+  openModal('profileOverlay');
+}
+
 function openModal(id) {
   $(id).classList.remove('hidden');
 }
@@ -177,6 +217,28 @@ document.querySelectorAll('[data-close]').forEach(btn => {
 });
 
 $('gateLoginBtn').addEventListener('click', () => openModal('authOverlay'));
+
+$('openSubTabBtn').addEventListener('click', () => openProfile('sub'));
+
+document.querySelectorAll('[data-profile-tab]').forEach(tab => {
+  tab.addEventListener('click', () => switchProfileTab(tab.dataset.profileTab));
+});
+
+$('subActivateBtn').addEventListener('click', async () => {
+  const code = $('subCodeInput').value.trim();
+  if (!code) return;
+  try {
+    const data = await api('/api/activate', { method: 'POST', body: { code } });
+    $('subStatus').innerHTML = `<span class="ok">${esc(data.message)}</span>`;
+    $('subCodeInput').value = '';
+    const me = await api('/api/me');
+    state.user = me.user;
+    renderAll();
+    renderProfile();
+  } catch (err) {
+    $('subStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
+  }
+});
 
 document.querySelectorAll('[data-auth-tab]').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -199,7 +261,7 @@ $('loginForm').addEventListener('submit', async e => {
   if (!username || !password) return authStatus('Заполните все поля', false);
   try {
     const data = await api('/api/login', { method: 'POST', body: { username, password } });
-    setSession(data.token, data.user);
+    await applySession(data.token);
     closeModal('authOverlay');
     $('loginForm').reset();
   } catch (err) {
@@ -211,30 +273,14 @@ $('registerForm').addEventListener('submit', async e => {
   e.preventDefault();
   const username = $('regUser').value.trim();
   const password = $('regPass').value;
-  const code = $('regCode').value.trim();
   if (!username || !password) return authStatus('Заполните никнейм и пароль', false);
   try {
-    const data = await api('/api/register', { method: 'POST', body: { username, password, code } });
-    setSession(data.token, data.user);
+    const data = await api('/api/register', { method: 'POST', body: { username, password } });
+    await applySession(data.token);
     closeModal('authOverlay');
     $('registerForm').reset();
   } catch (err) {
     authStatus(err.message, false);
-  }
-});
-
-$('activateBtn').addEventListener('click', async () => {
-  const code = $('activateInput').value.trim();
-  const statusEl = $('activateStatus');
-  if (!code) return;
-  try {
-    const data = await api('/api/activate', { method: 'POST', body: { code } });
-    statusEl.innerHTML = `<span class="ok">${esc(data.message)}</span>`;
-    const me = await api('/api/me');
-    state.user = me.user;
-    renderAll();
-  } catch (err) {
-    statusEl.innerHTML = `<span class="err">${esc(err.message)}</span>`;
   }
 });
 
@@ -282,7 +328,10 @@ async function refreshCodes() {
 
 $('genCodeBtn').addEventListener('click', async () => {
   try {
-    const data = await api('/api/codes', { method: 'POST' });
+    const data = await api('/api/codes', {
+      method: 'POST',
+      body: { type: $('codeType').value },
+    });
     navigator.clipboard?.writeText(data.code).catch(() => {});
     refreshCodes();
   } catch (err) {

@@ -19,8 +19,14 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
-      const code = makeCode();
-      await db.execute('INSERT INTO mlv_codes (code, created_by) VALUES (?, ?)', [code, user.id]);
+      const { type } = await readBody(req);
+      const validTypes = ['sub', 'tester', 'owner'];
+      const codeType = validTypes.includes(type) ? type : 'tester';
+      const code = makeCode(codeType);
+      await db.execute(
+        'INSERT INTO mlv_codes (code, type, created_by) VALUES (?, ?, ?)',
+        [code, codeType, user.id]
+      );
       return json(res, 200, { ok: true, code });
     }
 
