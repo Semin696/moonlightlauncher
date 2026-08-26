@@ -12,6 +12,7 @@ module.exports = async (req, res) => {
         role: user.role,
         subscribed: !!user.subscribed,
         createdAt: user.created_at,
+        email: user.email || null,
       },
     });
   } catch (e) {

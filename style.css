@@ -786,7 +786,41 @@ code {
 .side-icon {
   width: 20px;
   text-align: center;
-  filter: grayscale(.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.side-icon svg {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+.pass-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eye-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+  padding: 0;
+}
+
+.eye-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .greeting {

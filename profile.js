@@ -110,7 +110,43 @@ function renderProfile() {
     ? `<span class="badge sub">${subLabel()}</span>`
     : '<span class="badge nosub">Нет</span>';
   $('subOwnerBlock').classList.toggle('hidden', !isOwner());
+  $('pEmail').textContent = user.email || '—';
+  resetPassEye();
 }
+
+let realPassword = null;
+let passVisible = false;
+
+function resetPassEye() {
+  realPassword = null;
+  passVisible = false;
+  $('pPass').textContent = '••••••••••';
+  $('passEye').title = 'Показать пароль';
+}
+
+$('passEye').addEventListener('click', async () => {
+  if (passVisible) {
+    passVisible = false;
+    $('pPass').textContent = '••••••••••';
+    $('passEye').title = 'Показать пароль';
+    return;
+  }
+  if (realPassword == null) {
+    try {
+      const data = await api('/api/credentials');
+      realPassword = data.password;
+      if (data.email && !$('pEmail').textContent.includes('@')) {
+        $('pEmail').textContent = data.email;
+      }
+    } catch {
+      $('pPass').textContent = '—';
+      return;
+    }
+  }
+  passVisible = true;
+  $('pPass').textContent = realPassword ?? '—';
+  $('passEye').title = 'Скрыть пароль';
+});
 
 function switchSec(sec) {
   document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.sec === sec));

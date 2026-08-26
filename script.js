@@ -114,10 +114,11 @@ $('loginForm').addEventListener('submit', async e => {
 $('registerForm').addEventListener('submit', async e => {
   e.preventDefault();
   const username = $('regUser').value.trim();
+  const email = $('regEmail').value.trim();
   const password = $('regPass').value;
-  if (!username || !password) return authStatus('Заполните никнейм и пароль', false);
+  if (!username || !email || !password) return authStatus('Заполните все поля', false);
   try {
-    const data = await api('/api/register', { method: 'POST', body: { username, password } });
+    const data = await api('/api/register', { method: 'POST', body: { username, email, password } });
     localStorage.setItem(TOKEN_KEY, data.token);
     const me = await api('/api/me');
     user = me.user;
