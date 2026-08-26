@@ -74,11 +74,6 @@ document.querySelectorAll('[data-close]').forEach(btn => {
 
 $('heroDownloadBtn').addEventListener('click', requestDownload);
 
-$('navDownloadLink').addEventListener('click', e => {
-  e.preventDefault();
-  requestDownload();
-});
-
 document.querySelectorAll('[data-auth-tab]').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('[data-auth-tab]').forEach(t => t.classList.remove('active'));
