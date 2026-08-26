@@ -22,7 +22,7 @@
       <span>MoonLight <span class="accent">Visual</span></span>
     </a>
     <nav class="nav">
-      <a href="#download">Скачать</a>
+      <a href="#" id="navDownloadLink">Скачать</a>
       <a href="#features">Возможности</a>
     </nav>
     <div class="auth-area" id="authArea"></div>
@@ -35,40 +35,9 @@
       <h1>MoonLight <span class="accent">Visual</span></h1>
       <p class="subtitle">Быстрый и удобный лаунчер. Одна кнопка — и ты в игре.</p>
       <div class="hero-actions">
-        <a href="#download" class="btn primary big">Скачать лаунчер</a>
+        <button class="btn primary big" id="heroDownloadBtn">Скачать лаунчер</button>
       </div>
-    </section>
-
-    <section class="section" id="download">
-      <h2>Скачать</h2>
-
-      <div class="card download-card">
-        <div id="gateGuest" class="gate">
-          <div class="gate-icon">🔒</div>
-          <p>Чтобы скачать лаунчер, войдите в аккаунт.</p>
-          <button class="btn primary" id="gateLoginBtn">Войти / Регистрация</button>
-        </div>
-
-        <div id="gateNoSub" class="gate hidden">
-          <div class="gate-icon">⭐</div>
-          <p>У вас нет активной подписки.</p>
-          <p class="hint">Подписка не продаётся — её выдаёт владелец по коду. Активировать код можно в профиле, во вкладке «Подписка».</p>
-          <button class="btn primary" id="openSubTabBtn">Активировать код</button>
-        </div>
-
-        <div id="gateOk" class="hidden">
-          <div class="download-list" id="downloadList">
-            <div class="loading">
-              <div class="spinner"></div>
-              <p>Ищем последнюю версию...</p>
-            </div>
-          </div>
-          <div class="status hidden" id="errorState">
-            <p>Файлы ещё не загружены.</p>
-            <p class="hint">Скоро здесь появится ссылка на скачивание. Следите за обновлениями.</p>
-          </div>
-        </div>
-      </div>
+      <p class="hero-hint hidden" id="heroHint"></p>
     </section>
 
     <section class="section" id="features">
@@ -77,10 +46,16 @@
         <div class="feature">
           <div class="feature-icon">⚡</div>
           <h3>Быстрый запуск</h3>
-          <p>Мгновенный старт игры без лишних шагов и настроек.</p>
+          <p>Быстрый старт.</p>
         </div>
         <div class="feature">
-          <div class="feature-icon">🔄</div>
+          <div class="feature-icon">
+            <svg class="feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v11"/>
+              <path d="M6.5 10.5L12 16l5.5-5.5"/>
+              <path d="M5 20h14"/>
+            </svg>
+          </div>
           <h3>Автообновления</h3>
           <p>Лаунчер сам проверяет и устанавливает свежие версии.</p>
         </div>
@@ -156,6 +131,7 @@
       </div>
       <div class="tabs">
         <button class="tab active" data-profile-tab="info">Профиль</button>
+        <button class="tab" data-profile-tab="launcher">Лаунчер</button>
         <button class="tab" data-profile-tab="sub">Подписка</button>
       </div>
 
@@ -172,6 +148,25 @@
         </div>
         <button class="btn primary wide hidden" id="profileOwnerBtn">Панель владельца</button>
         <button class="btn danger wide" id="profileLogoutBtn">Выйти из аккаунта</button>
+      </div>
+
+      <div id="profileTabLauncher" class="modal-form hidden">
+        <div class="profile-rows">
+          <div class="profile-row">
+            <span>Активные подписки</span>
+            <span id="launcherSubs"></span>
+          </div>
+        </div>
+        <div id="launcherGate" class="hidden">
+          <p class="hint center">Для скачивания нужна подписка. Подписка не продаётся — активируйте код во вкладке «Подписка».</p>
+          <button class="btn primary wide" id="toSubTabBtn">Перейти к подписке</button>
+        </div>
+        <div id="launcherDownloads" class="hidden">
+          <div class="download-list" id="downloadList"></div>
+          <div class="status hidden" id="errorState">
+            <p>Лаунчер пока не загружен.</p>
+          </div>
+        </div>
       </div>
 
       <div id="profileTabSub" class="modal-form hidden">

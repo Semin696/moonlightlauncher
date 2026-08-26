@@ -322,32 +322,21 @@ code {
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  padding: 26px 10px;
+  padding: 10px 0;
 }
 
-.gate-icon {
-  font-size: 2.4rem;
+.hero-hint {
+  color: var(--err);
+  font-size: .9rem;
+  margin-top: 16px;
 }
 
-.gate p {
-  max-width: 420px;
-}
-
-.gate .hint {
-  color: var(--text-dim);
-  font-size: .88rem;
-}
-
-.activate-row {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 460px;
-}
-
-.activate-row .input {
-  flex: 1;
-  min-width: 0;
+.feature-svg {
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  margin: 0 auto;
+  color: var(--text);
 }
 
 .loading {

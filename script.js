@@ -125,31 +125,26 @@ function renderAuthArea() {
   }
 }
 
-function renderGate() {
-  const guest = $('gateGuest');
-  const noSub = $('gateNoSub');
-  const ok = $('gateOk');
-  if (!state.user) {
-    guest.classList.remove('hidden');
-    noSub.classList.add('hidden');
-    ok.classList.add('hidden');
-    return;
-  }
+function renderLauncherTab() {
+  const subs = $('launcherSubs');
+  const gate = $('launcherGate');
+  const dl = $('launcherDownloads');
+  if (!state.user) return;
+  subs.innerHTML = hasSub()
+    ? '<span class="badge sub">Тестовая подписка · активна</span>'
+    : '<span class="badge nosub">Нет</span>';
   if (!hasSub()) {
-    guest.classList.add('hidden');
-    noSub.classList.remove('hidden');
-    ok.classList.add('hidden');
+    gate.classList.remove('hidden');
+    dl.classList.add('hidden');
     return;
   }
-  guest.classList.add('hidden');
-  noSub.classList.add('hidden');
-  ok.classList.remove('hidden');
+  gate.classList.add('hidden');
+  dl.classList.remove('hidden');
   loadDownloads();
 }
 
 function renderAll() {
   renderAuthArea();
-  renderGate();
 }
 
 async function restoreSession() {
@@ -189,11 +184,13 @@ function renderProfile() {
 function switchProfileTab(tab) {
   document.querySelectorAll('[data-profile-tab]').forEach(t => t.classList.toggle('active', t.dataset.profileTab === tab));
   $('profileTabInfo').classList.toggle('hidden', tab !== 'info');
+  $('profileTabLauncher').classList.toggle('hidden', tab !== 'launcher');
   $('profileTabSub').classList.toggle('hidden', tab !== 'sub');
 }
 
 function openProfile(tab) {
   renderProfile();
+  if (tab === 'launcher') renderLauncherTab();
   switchProfileTab(tab);
   openModal('profileOverlay');
 }
@@ -216,13 +213,31 @@ document.querySelectorAll('[data-close]').forEach(btn => {
   btn.addEventListener('click', () => closeModal(btn.dataset.close));
 });
 
-$('gateLoginBtn').addEventListener('click', () => openModal('authOverlay'));
+function requestDownload() {
+  if (!state.user) {
+    const hint = $('heroHint');
+    hint.textContent = 'Скачивание доступно в профиле после входа и подписки.';
+    hint.classList.remove('hidden');
+    setTimeout(() => hint.classList.add('hidden'), 4000);
+    return;
+  }
+  openProfile('launcher');
+}
 
-$('openSubTabBtn').addEventListener('click', () => openProfile('sub'));
+$('heroDownloadBtn').addEventListener('click', requestDownload);
+$('navDownloadLink').addEventListener('click', e => {
+  e.preventDefault();
+  requestDownload();
+});
 
 document.querySelectorAll('[data-profile-tab]').forEach(tab => {
-  tab.addEventListener('click', () => switchProfileTab(tab.dataset.profileTab));
+  tab.addEventListener('click', () => {
+    switchProfileTab(tab.dataset.profileTab);
+    if (tab.dataset.profileTab === 'launcher') renderLauncherTab();
+  });
 });
+
+$('toSubTabBtn').addEventListener('click', () => switchProfileTab('sub'));
 
 $('subActivateBtn').addEventListener('click', async () => {
   const code = $('subCodeInput').value.trim();
@@ -235,6 +250,8 @@ $('subActivateBtn').addEventListener('click', async () => {
     state.user = me.user;
     renderAll();
     renderProfile();
+    renderLauncherTab();
+    switchProfileTab('launcher');
   } catch (err) {
     $('subStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
   }
