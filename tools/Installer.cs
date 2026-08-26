@@ -152,8 +152,8 @@ class Installer : Form
 
             var steps = new Action[]
             {
-                () => ExtractResource("MoonLight.launcher.exe", Path.Combine(target, "MoonLight Launcher.exe")),
-                () => ExtractZip("MoonLight.game.zip", Path.Combine(target, "game")),
+                () => ExtractResource("MoonLight Launcher.exe", Path.Combine(target, "MoonLight Launcher.exe")),
+                () => ExtractZip("game.zip", Path.Combine(target, "game")),
                 () => CreateShortcut(Path.Combine(target, "MoonLight Launcher.exe"))
             };
 
