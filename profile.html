@@ -41,7 +41,7 @@
           <aside class="side-menu">
             <h2 class="side-title">Мой профиль</h2>
             <button class="side-link active" data-sec="account"><span class="side-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.0001 21.0499V20.0998C19.0001 17.4801 16.7579 15.35 14.0002 15.35H10.0001C7.24245 15.35 5.00031 17.48 5.00024 20.0998V21.0499C5.00024 21.5746 4.55241 22 4.00012 22C3.44784 22 3 21.5746 3 21.0499V20.0998C3.00007 16.4307 6.13788 13.4501 10.0001 13.4501H14.0002C17.8624 13.4502 20.9999 16.4308 21 20.0998V21.0499C21 21.5745 20.5525 21.9999 20.0002 22C19.448 22 19.0001 21.5746 19.0001 21.0499ZM15 7.75017C15 6.17536 13.6577 4.90021 12 4.90021C10.3423 4.90027 9 6.1754 9 7.75017C9.00007 9.32489 10.3424 10.6001 12 10.6001C13.6577 10.6001 14.9999 9.32493 15 7.75017ZM17.0002 7.75017C17.0002 10.3743 14.7622 12.5 12 12.5C9.23781 12.4999 7.00019 10.3742 7.00012 7.75017C7.00012 5.12607 9.23777 3.00006 12 3C14.7623 3 17.0002 5.12604 17.0002 7.75017Z" fill="currentColor"></path></svg></span>Аккаунт</button>
-            <button class="side-link" data-sec="launcher"><span class="side-icon">⬇️</span>Лаунчер</button>
+            <button class="side-link" data-sec="launcher"><span class="side-icon"><svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.99999 13.7453C8.84999 13.7453 8.70937 13.7208 8.57812 13.6717C8.44687 13.6226 8.32499 13.5383 8.21249 13.4187L4.1625 9.14375C3.9375 8.90625 3.8295 8.62917 3.8385 8.3125C3.8475 7.99583 3.9555 7.71875 4.1625 7.48125C4.3875 7.24375 4.65487 7.12025 4.96462 7.11075C5.27437 7.10125 5.54137 7.21485 5.76562 7.45156L7.87499 9.67813V1.1875C7.87499 0.851045 7.98299 0.569212 8.19899 0.342004C8.41499 0.114796 8.68199 0.000795761 8.99999 4.09482e-06C9.31799 -0.000787572 9.58537 0.113213 9.80212 0.342004C10.0189 0.570796 10.1265 0.852629 10.125 1.1875V9.67813L12.2344 7.45156C12.4594 7.21406 12.7267 7.10006 13.0365 7.10956C13.3462 7.11906 13.6132 7.24296 13.8375 7.48125C14.0437 7.71875 14.1517 7.99583 14.1615 8.3125C14.1712 8.62917 14.0632 8.90625 13.8375 9.14375L9.78749 13.4187C9.67499 13.5375 9.55312 13.6218 9.42187 13.6717C9.29062 13.7216 9.14999 13.7461 8.99999 13.7453ZM2.25 19C1.63125 19 1.10175 18.7676 0.661499 18.3029C0.22125 17.8382 0.000749999 17.2789 0 16.625V14.25C0 13.9135 0.108 13.6317 0.324 13.4045C0.54 13.1773 0.806999 13.0633 1.125 13.0625C1.443 13.0617 1.71037 13.1757 1.92712 13.4045C2.14387 13.6333 2.2515 13.9151 2.25 14.25V16.625H15.75V14.25C15.75 13.9135 15.858 13.6317 16.074 13.4045C16.29 13.1773 16.557 13.0633 16.875 13.0625C17.193 13.0617 17.4604 13.1757 17.6771 13.4045C17.8939 13.6333 18.0015 13.9151 18 14.25V16.625C18 17.2781 17.7799 17.8374 17.3396 18.3029C16.8994 18.7684 16.3695 19.0008 15.75 19H2.25Z" fill="currentColor"></path></svg></span>Скачать лаунчер</button>
             <button class="side-link" data-sec="sub"><span class="side-icon">⭐</span>Подписка</button>
           </aside>
 
@@ -77,18 +77,24 @@
             </section>
 
             <section id="secLauncher" class="p-sec hidden">
-              <h2 class="greeting">Лаунчер</h2>
+              <h2 class="greeting">Скачать лаунчер</h2>
               <div class="p-rows">
                 <div class="p-row"><span>Активные подписки</span><b id="launcherSubs"></b></div>
               </div>
-              <div id="launcherGate" class="hidden">
-                <p class="hint center">Для скачивания нужна подписка. Она не продаётся — активируйте ключ во вкладке «Аккаунт».</p>
-              </div>
-              <div id="launcherDownloads" class="hidden">
-                <div class="download-list" id="downloadList"></div>
-                <div class="status hidden" id="errorState">
-                  <p>Лаунчер пока не загружен.</p>
+              <div class="launcher-card">
+                <div class="launcher-head">
+                  <div class="launcher-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="rgba(115,83,255,0.2)" stroke="#7353FF" stroke-width="1.5" stroke-linejoin="round"></path><path d="M2 17l10 5 10-5" stroke="#7353FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2 12l10 5 10-5" stroke="#7353FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </div>
+                  <div>
+                    <div class="launcher-name">MoonLight Visuals</div>
+                    <div class="launcher-os">Windows 10/11</div>
+                  </div>
                 </div>
+                <a id="dlBtn" class="btn grad wide disabled">Нет активной подписки</a>
+              </div>
+              <div class="status hidden" id="errorState">
+                <p>Лаунчер пока не загружен.</p>
               </div>
             </section>
 

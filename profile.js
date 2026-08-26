@@ -67,6 +67,7 @@ function formatSize(bytes) {
 function loadDownloads() {
   if (downloadsLoaded) return;
   downloadsLoaded = true;
+  const btn = $('dlBtn');
   fetch(`${API_URL}?t=${Date.now()}`)
     .then(r => {
       if (!r.ok) throw new Error(r.status);
@@ -74,25 +75,18 @@ function loadDownloads() {
     })
     .then(files => {
       if (!Array.isArray(files)) throw new Error('bad response');
-      const builds = files.filter(f => f.type === 'file' && EXE_EXT.test(f.name));
-      if (builds.length === 0) {
-        $('downloadList').classList.add('hidden');
-        $('errorState').classList.remove('hidden');
+      const build = files.find(f => f.type === 'file' && EXE_EXT.test(f.name));
+      if (!build) {
+        btn.textContent = 'Лаунчер пока не загружен';
         return;
       }
-      $('downloadList').innerHTML = builds.map(file => `
-        <div class="download-item">
-          <div class="file-info">
-            <div class="file-name">${esc(file.name)}</div>
-            <div class="file-meta">Размер: ${formatSize(file.size)}</div>
-          </div>
-          <a class="btn primary" href="${esc(file.download_url)}" download>Скачать</a>
-        </div>
-      `).join('');
+      btn.textContent = 'Скачать лаунчер';
+      btn.href = build.download_url;
+      btn.setAttribute('download', '');
+      btn.classList.remove('disabled');
     })
     .catch(() => {
-      $('downloadList').classList.add('hidden');
-      $('errorState').classList.remove('hidden');
+      btn.textContent = 'Лаунчер пока не загружен';
     });
 }
 
@@ -157,15 +151,15 @@ function switchSec(sec) {
 }
 
 function renderLauncher() {
-  const gate = $('launcherGate');
-  const dl = $('launcherDownloads');
+  const btn = $('dlBtn');
   if (!user.subscribed) {
-    gate.classList.remove('hidden');
-    dl.classList.add('hidden');
+    btn.textContent = 'Нет активной подписки';
+    btn.removeAttribute('href');
+    btn.removeAttribute('download');
+    btn.classList.add('disabled');
     return;
   }
-  gate.classList.add('hidden');
-  dl.classList.remove('hidden');
+  btn.classList.remove('disabled');
   loadDownloads();
 }
 

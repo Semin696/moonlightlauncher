@@ -877,6 +877,54 @@ code {
   max-width: 340px;
 }
 
+.launcher-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 460px;
+}
+
+.launcher-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.launcher-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 15px;
+  background: rgba(115, 83, 255, .12);
+  border: 1px solid rgba(115, 83, 255, .25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.launcher-name {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.launcher-os {
+  color: var(--text-dim);
+  font-size: .88rem;
+  margin-top: 4px;
+}
+
+.btn.disabled,
+a.btn.disabled {
+  pointer-events: none;
+  opacity: .55;
+  filter: saturate(.55);
+  cursor: default;
+}
+
 #accActivateBtn,
 #tabGenKeyBtn {
   margin-top: 14px;
