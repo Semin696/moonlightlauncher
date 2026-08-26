@@ -759,8 +759,7 @@ code {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 330px;
+  justify-content: center;
   transition: border-color .25s ease, transform .25s ease;
 }
 
@@ -782,24 +781,6 @@ code {
   color: var(--text-dim);
   font-size: .9rem;
   line-height: 1.6;
-}
-
-.feature-card-image {
-  padding: 0 18px;
-  margin-top: auto;
-}
-
-.feature-card-image img {
-  width: 100%;
-  display: block;
-  filter: grayscale(1);
-  opacity: .92;
-  transition: opacity .25s ease, filter .25s ease;
-}
-
-.feature-card:hover .feature-card-image img {
-  filter: grayscale(1);
-  opacity: 1;
 }
 
 .pricing-section {
@@ -894,18 +875,6 @@ code {
 
 .pricing-card-btn:hover {
   background: rgba(157, 189, 245, .12);
-}
-
-.pricing-card-image {
-  margin-top: auto;
-  padding: 0 14px;
-}
-
-.pricing-card-image img {
-  width: 100%;
-  display: block;
-  filter: grayscale(1);
-  opacity: .92;
 }
 
 @media (max-width: 920px) {
