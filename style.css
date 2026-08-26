@@ -155,6 +155,8 @@ code {
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text);
+  text-decoration: none;
 }
 
 .badge.sub {
@@ -598,6 +600,12 @@ code {
   .activate-row {
     flex-direction: column;
   }
+}
+
+.badge.name.link,
+.badge.name.link:hover,
+.badge.name.link:visited {
+  text-decoration: none;
 }
 
 .badge.name.link {
