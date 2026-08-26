@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoonLight Launcher — скачать лаунчер</title>
-  <meta name="description" content="MoonLight Launcher — удобный игровой лаунчер. Скачайте последнюю версию бесплатно.">
+  <title>MoonLight Visual — скачать лаунчер</title>
+  <meta name="description" content="MoonLight Visual — удобный игровой лаунчер. Скачайте последнюю версию бесплатно.">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,19 +19,20 @@
   <header class="header">
     <a class="brand" href="#">
       <img src="logo.png" alt="" class="brand-logo">
-      <span>MoonLight <span class="accent">Launcher</span></span>
+      <span>MoonLight <span class="accent">Visual</span></span>
     </a>
     <nav class="nav">
       <a href="#download">Скачать</a>
       <a href="#features">Возможности</a>
     </nav>
+    <div class="auth-area" id="authArea"></div>
   </header>
 
   <main>
 
     <section class="hero">
-      <img src="logo.png" alt="Логотип MoonLight Launcher" class="hero-logo">
-      <h1>MoonLight <span class="accent">Launcher</span></h1>
+      <img src="logo.png" alt="Логотип MoonLight Visual" class="hero-logo">
+      <h1>MoonLight <span class="accent">Visual</span></h1>
       <p class="subtitle">Быстрый и удобный лаунчер. Одна кнопка — и ты в игре.</p>
       <div class="hero-actions">
         <a href="#download" class="btn primary big">Скачать лаунчер</a>
@@ -40,18 +41,36 @@
 
     <section class="section" id="download">
       <h2>Скачать</h2>
-      <p class="section-sub">Последние сборки из папки <code>realise</code> репозитория</p>
 
       <div class="card download-card">
-        <div class="download-list" id="downloadList">
-          <div class="loading" id="loadingState">
-            <div class="spinner"></div>
-            <p>Ищем последнюю версию...</p>
-          </div>
+        <div id="gateGuest" class="gate">
+          <div class="gate-icon">🔒</div>
+          <p>Чтобы скачать лаунчер, войдите в аккаунт.</p>
+          <button class="btn primary" id="gateLoginBtn">Войти / Регистрация</button>
         </div>
-        <div class="status hidden" id="errorState">
-          <p>Файлы ещё не загружены.</p>
-          <p class="hint">Скоро здесь появится ссылка на скачивание. Следите за обновлениями.</p>
+
+        <div id="gateNoSub" class="gate hidden">
+          <div class="gate-icon">⭐</div>
+          <p>У вас нет активной подписки.</p>
+          <p class="hint">Подписка не продаётся — её выдаёт владелец по коду. Введите полученный код:</p>
+          <div class="activate-row">
+            <input type="text" id="activateInput" class="input" placeholder="MLV-XXXXX-XXXXX" spellcheck="false" autocomplete="off">
+            <button class="btn primary" id="activateBtn">Активировать</button>
+          </div>
+          <div class="status" id="activateStatus"></div>
+        </div>
+
+        <div id="gateOk" class="hidden">
+          <div class="download-list" id="downloadList">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Ищем последнюю версию...</p>
+            </div>
+          </div>
+          <div class="status hidden" id="errorState">
+            <p>Файлы ещё не загружены.</p>
+            <p class="hint">Скоро здесь появится ссылка на скачивание. Следите за обновлениями.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -85,8 +104,50 @@
   </main>
 
   <footer class="footer">
-    <p>© 2026 MoonLight Launcher</p>
+    <p>© 2026 MoonLight Visual</p>
   </footer>
+
+  <div class="modal-overlay hidden" id="authOverlay">
+    <div class="modal">
+      <button class="modal-close" data-close="authOverlay">×</button>
+      <h2 class="modal-title">MoonLight Visual</h2>
+      <div class="tabs">
+        <button class="tab active" data-auth-tab="login">Вход</button>
+        <button class="tab" data-auth-tab="register">Регистрация</button>
+      </div>
+
+      <form id="loginForm" class="modal-form">
+        <label class="field-label" for="loginUser">Никнейм</label>
+        <input type="text" id="loginUser" class="input" autocomplete="username" spellcheck="false">
+        <label class="field-label" for="loginPass">Пароль</label>
+        <input type="password" id="loginPass" class="input" autocomplete="current-password">
+        <button type="submit" class="btn primary wide">Войти</button>
+      </form>
+
+      <form id="registerForm" class="modal-form hidden">
+        <label class="field-label" for="regUser">Никнейм</label>
+        <input type="text" id="regUser" class="input" autocomplete="off" spellcheck="false">
+        <label class="field-label" for="regPass">Пароль</label>
+        <input type="password" id="regPass" class="input" autocomplete="new-password">
+        <label class="field-label" for="regCode">Код владельца или приглашение (необязательно)</label>
+        <input type="text" id="regCode" class="input" autocomplete="off" spellcheck="false">
+        <button type="submit" class="btn primary wide">Создать аккаунт</button>
+      </form>
+
+      <div class="status" id="authStatus"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="ownerOverlay">
+    <div class="modal wide-modal">
+      <button class="modal-close" data-close="ownerOverlay">×</button>
+      <h2 class="modal-title">Панель владельца</h2>
+      <p class="hint">Генерируйте коды для тестеров. Один код активирует одну подписку.</p>
+      <button class="btn primary wide" id="genCodeBtn">Сгенерировать код</button>
+      <div class="codes-list" id="codesList"></div>
+      <div class="status" id="ownerStatus"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
