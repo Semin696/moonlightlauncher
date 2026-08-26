@@ -192,6 +192,13 @@ $('tabGenKeyBtn').addEventListener('click', async () => {
   }
 });
 
+document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('shopStatus').innerHTML =
+      '<span class="err">Покупки временно недоступны. Подписка выдаётся по ключу активации.</span>';
+  });
+});
+
 document.querySelectorAll('.side-link').forEach(link => {
   link.addEventListener('click', () => {
     history.replaceState(null, '', `#${link.dataset.sec}`);
