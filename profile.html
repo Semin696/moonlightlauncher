@@ -27,93 +27,83 @@
   </header>
 
   <main>
-    <section class="section section-narrow">
-      <h2>Профиль</h2>
+    <section class="section">
+      <div class="loading" id="pageLoading">
+        <div class="spinner"></div>
+        <p>Загрузка...</p>
+      </div>
 
-      <div class="card download-card">
-        <div class="loading" id="pageLoading">
-          <div class="spinner"></div>
-          <p>Загрузка...</p>
-        </div>
+      <div id="guestGate" class="hidden">
+        <p class="hint center">Вы не вошли в аккаунт.</p>
+        <a class="btn primary wide narrow-btn" href="index.html">Войти на главной странице</a>
+      </div>
 
-        <div id="guestGate" class="hidden">
-          <p class="hint center">Вы не вошли в аккаунт.</p>
-          <a class="btn primary wide" href="index.html">Войти на главной странице</a>
-        </div>
+      <div id="profileContent" class="hidden">
+        <div class="profile-layout">
 
-        <div id="profileContent" class="hidden">
-          <div class="profile-head">
-            <div class="avatar" id="profileAvatar">?</div>
-            <div>
-              <div class="profile-name" id="profileName"></div>
-              <div class="profile-role" id="profileRole"></div>
-            </div>
-          </div>
+          <aside class="side-menu">
+            <h2 class="side-title">Мой профиль</h2>
+            <button class="side-link active" data-sec="account"><span class="side-icon">👤</span>Аккаунт</button>
+            <button class="side-link" data-sec="launcher"><span class="side-icon">⬇️</span>Лаунчер</button>
+            <button class="side-link" data-sec="sub"><span class="side-icon">⭐</span>Подписка</button>
+          </aside>
 
-          <div class="tabs">
-            <button class="tab active" data-tab="info">Профиль</button>
-            <button class="tab" data-tab="launcher">Лаунчер</button>
-            <button class="tab" data-tab="sub">Подписка</button>
-          </div>
+          <div class="profile-main">
 
-          <div id="tabInfo" class="modal-form">
-            <div class="profile-rows">
-              <div class="profile-row">
-                <span>Статус</span>
-                <span id="profileSub"></span>
+            <section id="secAccount" class="p-sec">
+              <h2 class="greeting">Привет, <span class="name-green" id="pName"></span></h2>
+              <h3 class="p-heading">Информация о профиле</h3>
+              <div class="p-rows">
+                <div class="p-row"><span>Дата регистрации</span><b id="pDate"></b></div>
+                <div class="p-row"><span>ID</span><b id="pId"></b></div>
+                <div class="p-row"><span>Ваша роль</span><b class="role-accent" id="pRole"></b></div>
+                <div class="p-row"><span>Подписка</span><b id="pSubStatus"></b></div>
               </div>
-              <div class="profile-row">
-                <span>Дата регистрации</span>
-                <span id="profileDate"></span>
-              </div>
-            </div>
-            <a class="btn ghost wide" href="subscribe.html">Страница подписки</a>
-          </div>
+              <h3 class="p-heading">Активация ключа</h3>
+              <label class="field-label" for="accCodeInput">Введите ключ активации</label>
+              <input type="text" id="accCodeInput" class="input mono-input" placeholder="MONO-SUB-XXXXXX" spellcheck="false" autocomplete="off">
+              <button class="btn grad wide narrow-btn" id="accActivateBtn">Активировать ключ</button>
+              <div class="status" id="accStatus"></div>
+            </section>
 
-          <div id="tabLauncher" class="modal-form hidden">
-            <div class="profile-rows">
-              <div class="profile-row">
-                <span>Активные подписки</span>
-                <span id="launcherSubs"></span>
+            <section id="secLauncher" class="p-sec hidden">
+              <h2 class="greeting">Лаунчер</h2>
+              <div class="p-rows">
+                <div class="p-row"><span>Активные подписки</span><b id="launcherSubs"></b></div>
               </div>
-            </div>
-            <div id="launcherGate" class="hidden">
-              <p class="hint center">Для скачивания нужна подписка. Подписка не продаётся — активируйте код во вкладке «Подписка».</p>
-              <button class="btn primary wide" id="toSubTabBtn">Перейти к подписке</button>
-            </div>
-            <div id="launcherDownloads" class="hidden">
-              <div class="download-list" id="downloadList"></div>
-              <div class="status hidden" id="errorState">
-                <p>Лаунчер пока не загружен.</p>
+              <div id="launcherGate" class="hidden">
+                <p class="hint center">Для скачивания нужна подписка. Она не продаётся — активируйте ключ во вкладке «Аккаунт».</p>
               </div>
-            </div>
-          </div>
+              <div id="launcherDownloads" class="hidden">
+                <div class="download-list" id="downloadList"></div>
+                <div class="status hidden" id="errorState">
+                  <p>Лаунчер пока не загружен.</p>
+                </div>
+              </div>
+            </section>
 
-          <div id="tabSub" class="modal-form hidden">
-            <div class="sub-plans single">
-              <div class="sub-plan">
-                <div class="sub-plan-name">Навсегда</div>
-                <div class="sub-plan-price">9 999 ₽</div>
-                <span class="badge nosub">Недоступно</span>
+            <section id="secSub" class="p-sec hidden">
+              <h2 class="greeting">Подписка</h2>
+              <div class="sub-plans single">
+                <div class="sub-plan">
+                  <div class="sub-plan-name">Навсегда</div>
+                  <div class="sub-plan-price">9 999 ₽</div>
+                  <span class="badge nosub">Недоступно</span>
+                </div>
               </div>
-            </div>
-            <p class="hint center">Подписка сейчас не продаётся. Есть код от владельца? Активируйте его:</p>
-            <label class="field-label" for="subCodeInput">Код активации</label>
-            <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-SUB-XXXXXX" spellcheck="false" autocomplete="off">
-            <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
-            <div class="status" id="subStatus"></div>
+              <div class="owner-block hidden" id="subOwnerBlock">
+                <p class="hint center">Функция владельца: создание ключей активации.</p>
+                <label class="field-label" for="keyType">Тип ключа</label>
+                <select id="keyType" class="input">
+                  <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
+                  <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
+                  <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
+                </select>
+                <button class="btn grad wide narrow-btn" id="tabGenKeyBtn">Создать ключ активации</button>
+                <div class="status" id="tabGenKeyStatus"></div>
+              </div>
+            </section>
 
-            <div class="owner-block hidden" id="subOwnerBlock">
-              <p class="hint center">Функция владельца: создание ключей активации.</p>
-              <label class="field-label" for="keyType">Тип ключа</label>
-              <select id="keyType" class="input">
-                <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
-                <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
-                <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
-              </select>
-              <button class="btn primary wide" id="tabGenKeyBtn">Создать ключ активации</button>
-              <div class="status" id="tabGenKeyStatus"></div>
-            </div>
           </div>
         </div>
       </div>

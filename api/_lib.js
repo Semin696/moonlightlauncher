@@ -127,8 +127,7 @@ async function auth(req) {
      FROM mlv_sessions s JOIN mlv_users u ON u.id = s.user_id
      WHERE s.token = ? AND s.created_at > NOW() - INTERVAL 30 DAY`,
     [token]
-  );
-  return rows[0] || null;
+  );  return rows[0] || null;
 }
 
 module.exports = {

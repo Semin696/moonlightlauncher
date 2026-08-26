@@ -736,3 +736,141 @@ code {
   font-size: 1.05rem;
   margin-bottom: 4px;
 }
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+
+.side-title {
+  font-size: 1.15rem;
+  margin-bottom: 22px;
+}
+
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: .95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color .2s, background .2s, border-color .2s;
+}
+
+.side-link:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, .03);
+}
+
+.side-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.side-icon {
+  width: 20px;
+  text-align: center;
+  filter: grayscale(.2);
+}
+
+.greeting {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: 28px;
+}
+
+.name-green {
+  color: #6fe3a5;
+}
+
+.p-heading {
+  font-size: 1.15rem;
+  margin-bottom: 14px;
+}
+
+.p-rows {
+  margin-bottom: 30px;
+}
+
+.p-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 2px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.p-row b {
+  color: var(--text);
+  font-weight: 600;
+  word-break: break-all;
+  text-align: right;
+}
+
+.role-accent {
+  color: var(--accent) !important;
+}
+
+.btn.grad {
+  background: linear-gradient(135deg, #8a63ff, #5f8bff);
+  color: #fff;
+  box-shadow: 0 6px 26px rgba(122, 100, 255, .35);
+}
+
+.btn.grad:hover {
+  box-shadow: 0 8px 32px rgba(122, 100, 255, .5);
+}
+
+.narrow-btn {
+  max-width: 340px;
+}
+
+#accActivateBtn,
+#tabGenKeyBtn {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .side-title {
+    display: none;
+  }
+
+  .side-link {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .side-link.active {
+    border-bottom-color: var(--accent);
+  }
+}

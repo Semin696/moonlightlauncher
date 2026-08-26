@@ -30,6 +30,12 @@ function isOwner() {
   return user && user.role === 'owner';
 }
 
+function roleText() {
+  if (user.role === 'owner') return 'Владелец';
+  if (user.role === 'tester') return 'Тестер';
+  return 'Пользователь';
+}
+
 function subLabel() {
   return isOwner() ? 'Владельческая подписка · активна' : 'Подписка · активна';
 }
@@ -91,34 +97,30 @@ function loadDownloads() {
 }
 
 function renderProfile() {
-  $('profileAvatar').textContent = (user.username[0] || '?').toUpperCase();
-  $('profileName').textContent = user.username;
-  let roleText = 'Пользователь';
-  if (user.role === 'owner') roleText = 'Владелец';
-  else if (user.role === 'tester') roleText = 'Тестер';
-  else if (user.subscribed) roleText = 'С подпиской';
-  $('profileRole').textContent = roleText;
-  $('profileSub').innerHTML = user.subscribed
+  $('pName').textContent = user.username;
+  $('pDate').textContent = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('ru-RU')
+    : '—';
+  $('pId').textContent = user.id ?? '—';
+  $('pRole').textContent = roleText();
+  $('pSubStatus').innerHTML = user.subscribed
     ? `<span class="ok">${subLabel()}</span>`
     : '<span class="err">Нет</span>';
-  $('profileDate').textContent = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '—';
   $('launcherSubs').innerHTML = user.subscribed
     ? `<span class="badge sub">${subLabel()}</span>`
     : '<span class="badge nosub">Нет</span>';
   $('subOwnerBlock').classList.toggle('hidden', !isOwner());
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('[data-tab]').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  $('tabInfo').classList.toggle('hidden', tab !== 'info');
-  $('tabLauncher').classList.toggle('hidden', tab !== 'launcher');
-  $('tabSub').classList.toggle('hidden', tab !== 'sub');
-  if (tab === 'launcher') renderLauncherTab();
+function switchSec(sec) {
+  document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.sec === sec));
+  $('secAccount').classList.toggle('hidden', sec !== 'account');
+  $('secLauncher').classList.toggle('hidden', sec !== 'launcher');
+  $('secSub').classList.toggle('hidden', sec !== 'sub');
+  if (sec === 'launcher') renderLauncher();
 }
 
-function renderLauncherTab() {
+function renderLauncher() {
   const gate = $('launcherGate');
   const dl = $('launcherDownloads');
   if (!user.subscribed) {
@@ -131,31 +133,23 @@ function renderLauncherTab() {
   loadDownloads();
 }
 
-document.querySelectorAll('[data-tab]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    history.replaceState(null, '', `#${btn.dataset.tab}`);
-    switchTab(btn.dataset.tab);
-  });
-});
-
-$('toSubTabBtn').addEventListener('click', () => switchTab('sub'));
-
-$('subActivateBtn').addEventListener('click', async () => {
-  const code = $('subCodeInput').value.trim();
+async function activate(inputId, statusId) {
+  const code = $(inputId).value.trim();
   if (!code) return;
   try {
     const data = await api('/api/activate', { method: 'POST', body: { code } });
-    $('subStatus').innerHTML = `<span class="ok">${esc(data.message)}</span>`;
-    $('subCodeInput').value = '';
+    $(statusId).innerHTML = `<span class="ok">${esc(data.message)}</span>`;
+    $(inputId).value = '';
     const me = await api('/api/me');
     user = me.user;
     renderAuthArea();
     renderProfile();
-    switchTab('launcher');
   } catch (err) {
-    $('subStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
+    $(statusId).innerHTML = `<span class="err">${esc(err.message)}</span>`;
   }
-});
+}
+
+$('accActivateBtn').addEventListener('click', () => activate('accCodeInput', 'accStatus'));
 
 $('tabGenKeyBtn').addEventListener('click', async () => {
   try {
@@ -166,6 +160,13 @@ $('tabGenKeyBtn').addEventListener('click', async () => {
   } catch (err) {
     $('tabGenKeyStatus').innerHTML = `<span class="err">${esc(err.message)}</span>`;
   }
+});
+
+document.querySelectorAll('.side-link').forEach(link => {
+  link.addEventListener('click', () => {
+    history.replaceState(null, '', `#${link.dataset.sec}`);
+    switchSec(link.dataset.sec);
+  });
 });
 
 async function init() {
@@ -189,7 +190,7 @@ async function init() {
   $('profileContent').classList.remove('hidden');
   renderAuthArea();
   renderProfile();
-  switchTab(['info', 'launcher', 'sub'].includes(hash) ? hash : 'info');
+  switchSec(['account', 'launcher', 'sub'].includes(hash) ? hash : 'account');
 }
 
 init();
